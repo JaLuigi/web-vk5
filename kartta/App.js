@@ -43,25 +43,15 @@ export default function App() {
 
   return (
     <PaperProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Map">
-          screenOptions={{headers: (props) =>
-            <Appbar
-              {...props}
-              title="Map"
-              backgroundColor={settings.backgroundColor}
-              icon={icon}
-              getUsersPosition={getUsersPosition}
-            />
-            }}
-          <Stack.Screen name="Map">
-            {() =>
-              <Map location={location}/>
-            }
-          </Stack.Screen>
-        </Stack.Navigator>
-      </NavigationContainer>
+      <Appbar
+        title="Map"
+        backgroundColor={settings.backgroundColor}
+        icon={icon}
+        getUsersPosition={getUsersPosition}
+      />
+      <SafeAreaView style={styles.container}>
+        <Map location={location}/>
+      </SafeAreaView>
     </PaperProvider>
   );
 }
