@@ -1,35 +1,51 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 
-export default function Map(props) {
-  const [marker, setMarker] = useState(null);
-  const [location, setLocation] = useState({
-    latitude: 65.0800,
-    longitude: 25.4800,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.04221,
-  });
+export default function Map() {
+  const [location, setLocation] = useState(null);
+  const [markers, setMarkers] = useState([]);
 
-  const showMarker = (e) => {
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+      }
+
+      let userLocation = await Location.getCurrentPositionAsync({});
+      setLocation({
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+    })();
+  }, []);
+
+  const handleLongPress = (e) => {
     const coords = e.nativeEvent.coordinate;
-    setMarker(coords);
+    setMarkers((currentMarkers) => [...currentMarkers, coords]);
   };
+
+  if (!location) {
+    return null;
+  }
 
   return (
     <MapView
       style={styles.map}
       region={location}
-      /* mapType='satellite' */
-      onLongPress={showMarker}
+      onLongPress={handleLongPress}
     >
-      {marker && (
+      {markers.map((marker, index) => (
         <Marker
-          title="My Marker"
-          coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+          key={index}
+          coordinate={marker}
         />
-      )}
+      ))}
     </MapView>
   );
 }
